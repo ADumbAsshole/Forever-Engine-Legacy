@@ -4,7 +4,7 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.graphics.FlxGraphic;
 import flixel.input.keyboard.FlxKey;
 import meta.CoolUtil;
-import meta.InfoHud;
+import meta.Overlay;
 import meta.data.Highscore;
 import meta.data.dependency.Discord;
 import meta.state.*;
@@ -50,7 +50,18 @@ class Init extends FlxState
 			'Whether to have the strumline vertically flipped in gameplay.',
 			NOT_FORCED
 		],
-		'Auto Pause' => [true, Checkmark, 'Whether to pause the game automatically if the window is unfocused.', NOT_FORCED],
+		'Controller Mode' => [
+			false,
+			Checkmark,
+			'Whether to use a controller instead of the keyboard to play.',
+			NOT_FORCED
+		],
+		'Auto Pause' => [
+			true,
+			Checkmark,
+			'Whether to pause the game automatically if the window is unfocused.',
+			NOT_FORCED
+		],
 		'FPS Counter' => [true, Checkmark, 'Whether to display the FPS counter.', NOT_FORCED],
 		'Memory Counter' => [
 			true,
@@ -58,7 +69,12 @@ class Init extends FlxState
 			'Whether to display approximately how much memory is being used.',
 			NOT_FORCED
 		],
-		'Debug Info' => [false, Checkmark, 'Whether to display information like your game state.', NOT_FORCED],
+		'Debug Info' => [
+			false,
+			Checkmark,
+			'Whether to display information like your game state.',
+			NOT_FORCED
+		],
 		'Reduced Movements' => [
 			false,
 			Checkmark,
@@ -113,12 +129,28 @@ class Init extends FlxState
 			NOT_FORCED,
 			['none', 'Deuteranopia', 'Protanopia', 'Tritanopia']
 		],
-		"Clip Style" => ['stepmania', Selector, "Chooses a style for hold note clippings; StepMania: Holds under Receptors; FNF: Holds over receptors", NOT_FORCED, 
-			['StepMania', 'FNF']],
-		"UI Skin" => ['default', Selector, 'Choose a UI Skin for judgements, combo, etc.', NOT_FORCED, ''],
+		"Clip Style" => [
+			'stepmania',
+			Selector,
+			"Chooses a style for hold note clippings; StepMania: Holds under Receptors; FNF: Holds over receptors",
+			NOT_FORCED,
+			['StepMania', 'FNF']
+		],
+		"UI Skin" => [
+			'default',
+			Selector,
+			'Choose a UI Skin for judgements, combo, etc.',
+			NOT_FORCED,
+			''
+		],
 		"Note Skin" => ['default', Selector, 'Choose a note skin.', NOT_FORCED, ''],
 		"Framerate Cap" => [120, Selector, 'Define your maximum FPS.', NOT_FORCED, ['']],
-		"Opaque Arrows" => [false, Checkmark, "Makes the arrows at the top of the screen opaque again.", NOT_FORCED],
+		"Opaque Arrows" => [
+			false,
+			Checkmark,
+			"Makes the arrows at the top of the screen opaque again.",
+			NOT_FORCED
+		],
 		"Opaque Holds" => [false, Checkmark, "Huh, why isnt the trail cut off?", NOT_FORCED],
 		'Ghost Tapping' => [
 			false,
@@ -143,7 +175,7 @@ class Init extends FlxState
 		'Fixed Judgements' => [
 			false,
 			Checkmark,
-			"Fixes the judgements to the camera instead of to the world itself, making them easier to read.", 
+			"Fixes the judgements to the camera instead of to the world itself, making them easier to read.",
 			NOT_FORCED
 		],
 		'Simply Judgements' => [
@@ -152,8 +184,6 @@ class Init extends FlxState
 			"Simplifies the judgement animations, displaying only one judgement / rating sprite at a time.",
 			NOT_FORCED
 		],
-
-
 	];
 
 	public static var trueSettings:Map<String, Dynamic> = [];
@@ -226,12 +256,12 @@ class Init extends FlxState
 		FlxG.mouse.useSystemCursor = true; // Use system cursor because it's prettier
 		FlxG.mouse.visible = false; // Hide mouse on start
 		FlxGraphic.defaultPersist = true; // make sure we control all of the memory
-		
+
 		gotoTitleScreen();
 	}
 
 	private function gotoTitleScreen()
-	{	
+	{
 		if (trueSettings.get("Custom Titlescreen"))
 			Main.switchState(this, new CustomTitlescreen());
 		else
@@ -280,8 +310,10 @@ class Init extends FlxState
 
 		updateAll();
 
-		FlxG.sound.volume = FlxG.save.data.volume;
-		FlxG.sound.muted = FlxG.save.data.mute;
+		if(FlxG.save.data.volume != null)
+			FlxG.sound.volume = FlxG.save.data.volume;
+		if (FlxG.save.data.mute != null)
+			FlxG.sound.muted = FlxG.save.data.mute;
 	}
 
 	public static function loadControls():Void
@@ -309,9 +341,9 @@ class Init extends FlxState
 
 	public static function updateAll()
 	{
-		InfoHud.updateDisplayInfo(trueSettings.get('FPS Counter'), trueSettings.get('Debug Info'), trueSettings.get('Memory Counter'));
-
 		FlxG.autoPause = trueSettings.get('Auto Pause');
+
+		Overlay.updateDisplayInfo(trueSettings.get('FPS Counter'), trueSettings.get('Debug Info'), trueSettings.get('Memory Counter'));
 
 		#if !html5
 		Main.updateFramerate(trueSettings.get("Framerate Cap"));
